@@ -1,6 +1,6 @@
 @extends('master')
 
-@section('title', 'Pesan Mobil - Rental Mobil Aris')
+@section('title', 'Detail Transaksi - Rental Mobil Aris')
 
 @section('konten')
 <div class="row">
@@ -42,13 +42,13 @@
         <label class="form-label">Plat Kendaraan</label>
         <input type="text" name="plat" class="form-control" disabled value="{{$transaksi->car->plat}}">
         <label class="form-label">Tarif Per Hari</label>
-        <input type="text" id="tarif" name="tarif" class="form-control" disabled value=" {{$transaksi->car->tarif}}">
+        <input type="text" id="tarif" name="tarif" class="form-control" disabled value="Rp. {{number_format($transaksi->car->tarif, 0, ',', '.')}}">
         <label for="startDate">Mulai Peminjaman</label>
         <input id="startDate" name="startTime" class="form-control" type="date" disabled value="{{date($transaksi->start_time)}}" />
         <label for="endDate">Akhir Peminjaman</label>
         <input id="endDate" name="endTime" class="form-control" type="date" disabled value="{{date($transaksi->end_time)}}"/>
         <label class="form-label">Total Tarif</label>
-        <input type="text" id="total-tarif" name="tarifx" class="form-control" disabled value="Rp. {{$transaksi->total_price}}">
+        <input type="text" id="total-tarif" name="tarifx" class="form-control" disabled value="Rp. {{number_format($transaksi->total_price, 0, ',', '.')}}">
         <label class="form-label">Status</label>
         <input type="text" name="statusx" class="form-control" disabled value="{{$transaksi->status}}">
         <input type="hidden" name="status" class="form-control" value="{{$transaksi->status}}">

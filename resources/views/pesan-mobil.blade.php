@@ -23,13 +23,18 @@
     </nav>
     @if(count($errors) > 0)
     <div class="alert alert-danger" role="alert">
-        Terjadi Kesahalan, Harap Periksa Data Diri Anda
+        Terjadi Kesahalan, Harap Periksa Data Anda
     </div>
     @endif
     @if(session('success'))
-    <div class="alert alert-success" role="alert">
-        {{session('success')}}
-    </div>
+        <div class="alert alert-success" role="alert">
+            {{session('success')}}
+        </div>
+    @endif
+    @if(session('fail'))
+        <div class="alert alert-danger" role="alert">
+            {{session('fail')}}
+        </div>
     @endif
     <form action="/postPesanMobil" method="post">
         @csrf
@@ -45,11 +50,10 @@
         <label for="startDate">Mulai Peminjaman</label>
         <input id="startDate" name="startTime" class="form-control" type="date" value="{{date('Y-m-d')}}" />
         <label for="endDate">Akhir Peminjaman</label>
-        <input id="endDate" name="endTime" class="form-control" type="date" />
+        <input id="endDate" name="endTime" class="form-control" type="date" value="{{date('Y-m-d', strtotime('+1 day'))}}"/>
         <label class="form-label">Total Tarif</label>
-        <input type="text" id="total-tarif" name="tarifx" class="form-control" disabled value="Rp. {{$car->tarif}}">
-        <input type="hidden" id="total" name="total" class="form-control" value="">
-        <button type="button" id="hitung" class="btn btn-primary mt-3 mb-5">Hitung Tarif</button>
+        <input type="text" id="total-tarif" name="tarifx" class="form-control" disabled value="Rp. {{number_format($car->tarif, 0, ',', '.')}}">
+        <input type="hidden" id="total" name="total" class="form-control" value="{{$car->tarif}}">
         <button type="submit" class="btn btn-warning mt-3 mb-5">Pesan Mobil</button>
     </form>
 </div>
@@ -68,8 +72,8 @@
             @foreach($transaksi as $trans)
             <tr>
                 <th scope="row">{{$loop->iteration}}</th>
-                <td>{{$trans->start_time}}</td>
-                <td>{{$trans->end_time}}</td>
+                <td>{{date("d F Y", strtotime($trans->start_time))}}</td>
+                <td>{{date("d F Y", strtotime($trans->end_time))}}</td>
                 <td>{{$trans->status}}</td>
             </tr>
             @endforeach
@@ -83,17 +87,13 @@
     const tarif = document.querySelector('#tarif')
     const totalTarif = document.querySelector('#total-tarif')
     const total = document.querySelector('#total')
-    const hitung = document.querySelector('#hitung')
 
     startTime.addEventListener('change', function(e) {
-       count(e)
+        addTomorrow()
+        count(e)
     })
     endTime.addEventListener('change', function(e) {
        count(e)
-    })
-
-    hitung.addEventListener('click', function(e) {
-        count(e)
     })
 
     function count(e) {
@@ -102,11 +102,20 @@
         const end = new Date(endTime.value)
         const diff = end - start
         const daysDiff = Math.ceil(diff / (1000 * 60 * 60 * 24))
-        console.log(diff)
     
         const result = Number(tarif.value) * Number(daysDiff)
         total.value = result
-        totalTarif.value = 'Rp. ' + result
+        totalTarif.value = result.toLocaleString("id-ID", { style: "currency", currency: "IDR" }).replace(/\.\d{2}$/, '')
+    }
+
+    function addTomorrow() {
+        let today = new Date(startTime.value)
+        today.setDate(today.getDate() + 1)
+
+        let tahun = today.getFullYear()
+        let bulan = String(today.getMonth() + 1).padStart(2, '0')
+        let tanggal = String(today.getDate()).padStart(2, '0')
+        endTime.value = tahun + "-" + bulan + "-" + tanggal
     }
 </script>
 @endsection

@@ -32,12 +32,11 @@ class DashboardController extends Controller
         $field = ['merek', 'model'];
         $where = [];
         $user = $req->session()->get('user');
-
+        
         if ($req->query('merek') || $req->query('model')) {
             foreach ($field as $f) {
                 if ($req->input($f) !== null) $where[$f] = $req->input($f);
             }
-
             $car = CarModel::where($where)->get();
             $data = [
                 'name' => $user->name,
@@ -45,12 +44,24 @@ class DashboardController extends Controller
             ];
             return view('cari-mobil', $data);
         }
-        
+
+        $data['name'] = $user->name;
         $allCar = CarModel::all();
-        $data = [
-            'name' => $user->name,
-            'allCar' => $allCar,
-        ];
+        $data['allCar'] = $allCar;
+        if ($req->input('avail')) {
+            $i = 0;
+            foreach($allCar as $car) {
+                $allTransaksi = TransaksiModel::where(['car_id' => $car->id, 'status' => 'Meminjam'])->get();
+                foreach ($allTransaksi as $transaksi) {
+                    if (DashboardController::isDateInRange(date('Y-m-d'), $transaksi->start_time, $transaksi->end_time)) {
+                        unset($allCar[$i]);
+                    }
+                }
+                $i++;
+            }
+            $data['allCar'] = $allCar;
+        }
+        // dd($data['allCar']);
         return view('cari-mobil', $data);
     }
 
@@ -97,17 +108,12 @@ class DashboardController extends Controller
         $user = $req->session()->get('user');
         $car = CarModel::where(['id' => (int) $req->query('id')])->first();
         $transaksi = TransaksiModel::where(['car_id' => (int) $req->query('id'), 'status' => 'Meminjam'])->get();
-        // dd($transaksi);
         $data = [
             'name' => $user->name,
             'car' => $car,
             'transaksi' => $transaksi,
         ];
         return view('pesan-mobil', $data);
-    }
-
-    public function checkStatus($carId) {
-        $transaksi = TransaksiModel::where(['car_id' => $carId])->get();
     }
     
     public function postPesanMobil(Request $req) {
@@ -125,10 +131,10 @@ class DashboardController extends Controller
         ];
         $checkTransaksi = TransaksiModel::where(['car_id' => $data['car_id'], 'status' => 'Meminjam'])->get();
         foreach ($checkTransaksi as $transaksi) {
-            if (DashboardController::isDateInRange($data['start_time'], $transaksi->start_time, $transaksi->end_time) || DashboardController::isDateInRange($data['end_time'], $transaksi->start_time, $transaksi->end_time)) return redirect('dashboard')->with('fail-rent', 'Gagal Melakukan Booking Kendaraan');
+            if (DashboardController::isDateInRange($data['start_time'], $transaksi->start_time, $transaksi->end_time) || DashboardController::isDateInRange($data['end_time'], $transaksi->start_time, $transaksi->end_time)) return redirect('pesan-mobil?id=' . $data['car_id'])->with('fail', 'Gagal Melakukan Booking Kendaraan');
         }
         TransaksiModel::create($data);
-        return redirect('dashboard')->with('success-rent', 'Berhasil Melakukan Booking Pinjam Kendaraan');
+        return redirect('dashboard')->with('success', 'Berhasil Melakukan Booking Pinjam Kendaraan');
     }
 
     public function transaksi(Request $req) {
@@ -138,6 +144,7 @@ class DashboardController extends Controller
         
         $user = $req->session()->get('user');
         $transaksi = UsersModel::find($user->id)->transaksi;
+
         $data = [
             'name' => $user->name,
             'transaksi' => $transaksi
@@ -148,13 +155,15 @@ class DashboardController extends Controller
         if (!$req->session()->get('user')) {
             return redirect('/');
         }
-
+        
+        $user = $req->session()->get('user');
+        $transaksi = TransaksiModel::where(['id' => $req->query('id'), 'user_rent_id' => $user->id])->first();
         if ($req->query('id') === null) {
             return redirect('/dashboard');
         }
 
-        $user = $req->session()->get('user');
-        $transaksi = TransaksiModel::find($req->query('id'));
+        if (!$transaksi) return redirect('/transaksi')->with('fail', 'Anda Tidak Memiliki Akses !');
+
         $data = [
             'name' => $user->name,
             'transaksi' => $transaksi

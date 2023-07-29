@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\UsersModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +22,7 @@ class AuthController extends Controller
             'name' => 'required',
             'alamat' => 'required',
             'telp' => 'required',
-            'sim' => 'required',
+            'sim' => 'required|unique:user',
             'password' => 'required'
         ]);
 
@@ -34,7 +33,7 @@ class AuthController extends Controller
         }
         UsersModel::create($validator->validate());
 
-        return redirect('/');
+        return redirect('/')->with('success-add', 'Berhasil Mendaftarkan User');
     }
 
     public function postLogin(Request $req) {

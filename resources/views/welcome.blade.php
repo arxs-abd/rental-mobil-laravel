@@ -4,6 +4,11 @@
 
 @section('konten')
 <div class="row">
+    @if(session('success-add'))
+    <div class="alert alert-success" role="alert">
+        {{session('success-add')}}
+    </div>
+    @endif
     <img class="img-fluid w-75 mx-auto" src="{{url('img/rush.png')}}" alt="rush">
 </div>
 <div class="row">

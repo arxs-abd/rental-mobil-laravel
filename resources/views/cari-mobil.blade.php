@@ -41,6 +41,12 @@
             <label class="form-label">Model</label>
             <input type="text" name="model" class="form-control" value="{{old('model')}}">
         </div>
+        <div class="form-check mt-2">
+            <input class="form-check-input" name="avail" type="checkbox" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Tersedia Hari Ini
+            </label>
+        </div>
         <button type="submit" class="btn btn-success mt-3">Cari Mobil</button>
     </form>
 </div>
@@ -64,7 +70,7 @@
                 <td>{{$car->merek}}</td>
                 <td>{{$car->model}}</td>
                 <td>{{$car->plat}}</td>
-                <td>{{$car->tarif}}</td>
+                <td>{{'Rp. ' . number_format($car->tarif, 0, ',', '.')}}</td>
                 <td>
                     <a href="/pesan-mobil?id={{$car->id}}" class="btn btn-success">Pesan</a>
                 </td>

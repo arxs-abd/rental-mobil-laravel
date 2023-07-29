@@ -15,14 +15,14 @@
     </div>
 </div>
 <div class="row mt-5">
-    @if(session('success-rent'))
+    @if(session('success'))
         <div class="alert alert-success" role="alert">
-            {{session('success-rent')}}
+            {{session('success')}}
         </div>
     @endif
-    @if(session('fail-rent'))
+    @if(session('fail'))
         <div class="alert alert-danger" role="alert">
-            {{session('fail-rent')}}
+            {{session('fail')}}
         </div>
     @endif
     <div class="col">

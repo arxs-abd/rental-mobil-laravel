@@ -24,6 +24,11 @@
 </div>
 
 <div class="row">
+    @if(session('fail'))
+        <div class="alert alert-danger" role="alert">
+            {{session('fail')}}
+        </div>
+    @endif
     <table class="table">
         <thead>
             <tr>
@@ -43,7 +48,7 @@
                 <td>{{$trans->car->merek}}</td>
                 <td>{{$trans->car->model}}</td>
                 <td>{{$trans->car->plat}}</td>
-                <td>{{$trans->total_price}}</td>
+                <td>Rp. {{number_format($trans->total_price, 0, ',', '.')}}</td>
                 <td>{{$trans->status}}</td>
                 <td>
                     <a href="/transaksi-detail?id={{$trans->id}}" class="btn btn-success">Detail</a>
