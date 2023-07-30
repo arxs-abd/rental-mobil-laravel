@@ -9,7 +9,7 @@
         {{session('success-add')}}
     </div>
     @endif
-    <img class="img-fluid w-75 mx-auto" src="{{url('img/rush.png')}}" alt="rush">
+    <img class="img-fluid w-75 mx-auto" src="{{asset('img/rush.png')}}" alt="rush">
 </div>
 <div class="row">
     <div class="col">
